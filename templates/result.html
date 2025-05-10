@@ -1,0 +1,322 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <!-- Result Summary Card -->
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <div class="d-flex justify-content-between align-items-center mb-4">
+                    <h2 class="mb-0">Analysis Results</h2>
+                    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-1"></i> Check Another URL
+                    </a>
+                </div>
+                
+                <div class="alert 
+                    {% if results.prediction == 'phishing' %}
+                        alert-danger
+                    {% elif results.prediction == 'legitimate' %}
+                        alert-success
+                    {% else %}
+                        alert-warning
+                    {% endif %}
+                    mb-4">
+                    
+                    <div class="d-flex">
+                        <div class="me-3">
+                            {% if results.prediction == 'phishing' %}
+                                <i class="fas fa-exclamation-triangle fa-3x"></i>
+                            {% elif results.prediction == 'legitimate' %}
+                                <i class="fas fa-check-circle fa-3x"></i>
+                            {% else %}
+                                <i class="fas fa-question-circle fa-3x"></i>
+                            {% endif %}
+                        </div>
+                        <div>
+                            <h4 class="alert-heading">
+                                {% if results.prediction == 'phishing' %}
+                                    Potential Phishing Detected!
+                                {% elif results.prediction == 'legitimate' %}
+                                    Likely Legitimate
+                                {% else %}
+                                    Unable to Determine
+                                {% endif %}
+                            </h4>
+                            
+                            <p>
+                                <strong>URL:</strong> <a href="{{ url }}" target="_blank" class="text-break">{{ url }}</a>
+                            </p>
+                            
+                            <p>
+                                <strong>Risk Level:</strong> 
+                                <span class="badge
+                                    {% if results.risk_level == 'High' %}
+                                        bg-danger
+                                    {% elif results.risk_level == 'Medium' %}
+                                        bg-warning
+                                    {% else %}
+                                        bg-success
+                                    {% endif %}">
+                                    {{ results.risk_level }}
+                                </span>
+                                
+                                <strong class="ms-3">Confidence:</strong> 
+                                <span>{{ (results.confidence * 100) | round(1) }}%</span>
+                            </p>
+                            
+                            {% if results.prediction == 'phishing' %}
+                                <hr>
+                                <p class="mb-0">
+                                    <strong>Recommendation:</strong> Avoid visiting this website. It shows characteristics commonly associated with phishing sites.
+                                </p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Risk score visualization -->
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5>Risk Assessment</h5>
+                        <div class="mb-3">
+                            <canvas id="riskGauge" width="300" height="200"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        {% if results.explanations %}
+                            <h5>Why this might be {{ results.prediction }}:</h5>
+                            <ul class="list-group list-group-flush">
+                                {% for explanation in results.explanations %}
+                                    <li class="list-group-item bg-transparent">
+                                        <i class="fas fa-info-circle me-2 
+                                        {% if results.prediction == 'phishing' %}
+                                            text-danger
+                                        {% else %}
+                                            text-info
+                                        {% endif %}"></i>
+                                        {{ explanation }}
+                                    </li>
+                                {% endfor %}
+                            </ul>
+                        {% else %}
+                            <h5>Analysis Notes:</h5>
+                            <p>No specific issues were detected with this URL.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <!-- Detailed Features -->
+                <h5 class="mb-3">Detailed Features Analysis</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">URL Structure</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>URL Length</span>
+                                        <span class="badge bg-secondary">{{ results.features.url_length }} characters</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Domain</span>
+                                        <span class="badge bg-secondary">{{ results.features.domain }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>TLD</span>
+                                        <span class="badge bg-secondary">{{ results.features.tld }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Subdomains</span>
+                                        <span class="badge bg-secondary">{{ results.features.num_subdomains }}</span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Using HTTPS</span>
+                                        <span class="badge {{ 'bg-success' if results.features.uses_https else 'bg-danger' }}">
+                                            {{ 'Yes' if results.features.uses_https else 'No' }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Domain Information</h6>
+                            </div>
+                            <div class="card-body">
+                                <ul class="list-group list-group-flush">
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Domain Age</span>
+                                        <span class="badge 
+                                            {{ 'bg-success' if results.features.domain_age > 365 else
+                                               'bg-warning' if results.features.domain_age > 180 else
+                                               'bg-danger' }}">
+                                            {{ results.features.domain_age }} days
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Has IP Address</span>
+                                        <span class="badge {{ 'bg-danger' if results.features.has_ip_address else 'bg-success' }}">
+                                            {{ 'Yes' if results.features.has_ip_address else 'No' }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Has @ Symbol</span>
+                                        <span class="badge {{ 'bg-danger' if results.features.has_at_symbol else 'bg-success' }}">
+                                            {{ 'Yes' if results.features.has_at_symbol else 'No' }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Suspicious TLD</span>
+                                        <span class="badge {{ 'bg-danger' if results.features.has_suspicious_tld else 'bg-success' }}">
+                                            {{ 'Yes' if results.features.has_suspicious_tld else 'No' }}
+                                        </span>
+                                    </li>
+                                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                                        <span>Suspicious Keywords</span>
+                                        <span class="badge {{ 'bg-warning' if results.features.has_suspicious_words else 'bg-success' }}">
+                                            {{ 'Yes' if results.features.has_suspicious_words else 'No' }}
+                                        </span>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- If we have site-based features, show them -->
+                {% if results.features.has_form is defined %}
+                <div class="row mt-3">
+                    <div class="col-md-12">
+                        <div class="card mb-3">
+                            <div class="card-header">
+                                <h6 class="mb-0">Website Analysis</h6>
+                            </div>
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Contains Forms</span>
+                                                <span class="badge {{ 'bg-warning' if results.features.has_form else 'bg-success' }}">
+                                                    {{ 'Yes' if results.features.has_form else 'No' }}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Password Fields</span>
+                                                <span class="badge {{ 'bg-warning' if results.features.has_password_field else 'bg-success' }}">
+                                                    {{ 'Yes' if results.features.has_password_field else 'No' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <ul class="list-group list-group-flush">
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Suspicious Redirects</span>
+                                                <span class="badge {{ 'bg-danger' if results.features.has_suspicious_redirects else 'bg-success' }}">
+                                                    {{ 'Yes' if results.features.has_suspicious_redirects else 'No' }}
+                                                </span>
+                                            </li>
+                                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                                <span>Suspicious Scripts</span>
+                                                <span class="badge {{ 'bg-danger' if results.features.has_suspicious_scripts else 'bg-success' }}">
+                                                    {{ 'Yes' if results.features.has_suspicious_scripts else 'No' }}
+                                                </span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                
+                <!-- Educational information -->
+                <div class="alert alert-info mt-4">
+                    <h5><i class="fas fa-info-circle me-2"></i> How to Stay Safe</h5>
+                    <p>Even if a URL seems legitimate, always practice caution:</p>
+                    <ul>
+                        <li>Check for HTTPS and the padlock icon in your browser</li>
+                        <li>Look for spelling errors or unusual domains</li>
+                        <li>Be suspicious of urgent requests for personal information</li>
+                        <li>Don't click links in unsolicited emails or messages</li>
+                        <li>Use password managers that won't auto-fill on fake sites</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript to initialize charts -->
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Risk gauge chart
+        const confidence = {{ results.confidence }};
+        const ctx = document.getElementById('riskGauge').getContext('2d');
+        
+        const riskGauge = new Chart(ctx, {
+            type: 'doughnut',
+            data: {
+                datasets: [{
+                    data: [confidence, 1 - confidence],
+                    backgroundColor: [
+                        confidence > 0.7 ? '#dc3545' : confidence > 0.3 ? '#ffc107' : '#28a745',
+                        '#e9ecef'
+                    ],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                cutout: '70%',
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: false
+                    },
+                    tooltip: {
+                        enabled: false
+                    }
+                }
+            }
+        });
+        
+        // Add text in the center
+        Chart.register({
+            id: 'centerText',
+            beforeDraw: function(chart) {
+                const width = chart.width;
+                const height = chart.height;
+                const ctx = chart.ctx;
+                
+                ctx.restore();
+                const fontSize = (height / 100).toFixed(2);
+                ctx.font = fontSize + "em sans-serif";
+                ctx.textBaseline = "middle";
+                
+                const text = Math.round(confidence * 100) + "%";
+                const textX = Math.round((width - ctx.measureText(text).width) / 2);
+                const textY = height / 2;
+                
+                ctx.fillStyle = confidence > 0.7 ? '#dc3545' : confidence > 0.3 ? '#ffc107' : '#28a745';
+                ctx.fillText(text, textX, textY);
+                
+                const subTextY = height / 2 + 30;
+                ctx.font = (fontSize * 0.5) + "em sans-serif";
+                const subText = "Risk Score";
+                const subTextX = Math.round((width - ctx.measureText(subText).width) / 2);
+                ctx.fillText(subText, subTextX, subTextY);
+                
+                ctx.save();
+            }
+        });
+    });
+</script>
+{% endblock %}

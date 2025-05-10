@@ -1,0 +1,108 @@
+/* 
+ * Custom CSS for PhishGuard URL Detector
+ * Minimal additional styling to complement Bootstrap
+ */
+
+/* Subtle background texture */
+body {
+    background-color: var(--bs-dark);
+    position: relative;
+    min-height: 100vh;
+}
+
+/* Make the main container account for the footer */
+.container {
+    padding-bottom: 1.5rem;
+}
+
+/* Card styling adjustments */
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    border-radius: 0.5rem;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+}
+
+/* Emphasized title */
+.navbar-brand {
+    font-weight: bold;
+    letter-spacing: 0.5px;
+}
+
+/* Animations for form submission */
+.btn-primary {
+    transition: all 0.3s ease;
+}
+
+.btn-primary:active {
+    transform: scale(0.95);
+}
+
+/* Custom form focus styles */
+.form-control:focus {
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.15);
+}
+
+/* Progress indication for loading states */
+.progress-bar {
+    transition: width 0.5s ease;
+}
+
+/* Make the footer stick to bottom */
+footer {
+    width: 100%;
+    margin-top: auto;
+}
+
+/* Adjust risk gauge size */
+#riskGauge {
+    max-height: 250px;
+}
+
+/* Feature list styling */
+.list-group-item {
+    padding: 0.75rem 1.25rem;
+}
+
+/* Make cards more compact on mobile */
+@media (max-width: 768px) {
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .alert {
+        padding: 0.75rem 1rem;
+    }
+}
+
+/* Improve alert visibility */
+.alert-danger {
+    border-left: 5px solid #dc3545;
+}
+
+.alert-warning {
+    border-left: 5px solid #ffc107;
+}
+
+.alert-success {
+    border-left: 5px solid #28a745;
+}
+
+.alert-info {
+    border-left: 5px solid #0dcaf0;
+}
+
+/* Results page styling */
+.result-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+/* Prevent long URLs from breaking layout */
+.text-break {
+    word-break: break-all;
+    word-wrap: break-word;
+}

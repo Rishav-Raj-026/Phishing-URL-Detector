@@ -1,0 +1,141 @@
+{% extends "layout.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card border-0 shadow-sm mb-4">
+            <div class="card-body p-4">
+                <h1 class="text-center mb-4">
+                    <i class="fas fa-shield-alt text-primary me-2"></i>
+                    PhishGuard
+                </h1>
+                <h5 class="text-center text-muted mb-4">URL Phishing Detection Tool</h5>
+                
+                {% if not show_about %}
+                <form action="{{ url_for('analyze') }}" method="post" id="urlForm">
+                    <div class="mb-3">
+                        <label for="url" class="form-label">Enter a URL to check for phishing</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="fas fa-link"></i></span>
+                            <input type="text" class="form-control" id="url" name="url" 
+                                   placeholder="https://example.com" required>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-search me-1"></i> Analyze
+                            </button>
+                        </div>
+                        <div class="form-text">
+                            We'll analyze this URL for common phishing indicators and security risks.
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="alert alert-info mt-4">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-info-circle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>What is phishing?</h5>
+                            <p>Phishing is a cyber attack that uses disguised email addresses, websites, or messages to steal personal information. The attackers masquerade as a trusted entity and trick users into opening malicious links or providing sensitive data.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="row mt-4">
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-search fa-3x text-primary mb-3"></i>
+                                <h5>URL Analysis</h5>
+                                <p class="card-text text-muted">We analyze various aspects of URLs to detect suspicious patterns.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-brain fa-3x text-primary mb-3"></i>
+                                <h5>Machine Learning</h5>
+                                <p class="card-text text-muted">Our model is trained to recognize phishing patterns and indicators.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100 border-0 shadow-sm">
+                            <div class="card-body text-center">
+                                <i class="fas fa-file-alt fa-3x text-primary mb-3"></i>
+                                <h5>Detailed Reports</h5>
+                                <p class="card-text text-muted">Get comprehensive reports explaining why a URL may be suspicious.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% else %}
+                <!-- About section -->
+                <h2 class="mb-4">About PhishGuard</h2>
+                
+                <div class="mb-4">
+                    <h5>Our Mission</h5>
+                    <p>PhishGuard is dedicated to helping users stay safe online by identifying potentially malicious websites before they can cause harm. Our platform uses advanced analysis techniques and machine learning to detect phishing attempts.</p>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>How It Works</h5>
+                    <ol>
+                        <li>Enter a suspicious URL in our analyzer</li>
+                        <li>Our system extracts dozens of features from the URL and website</li>
+                        <li>Our machine learning model analyzes these features for phishing indicators</li>
+                        <li>You receive a detailed report with the risk assessment and explanation</li>
+                    </ol>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Features We Analyze</h5>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <ul>
+                                <li>URL length and structure</li>
+                                <li>Domain age and registration details</li>
+                                <li>Use of IP addresses or suspicious TLDs</li>
+                                <li>Presence of HTTPS/SSL</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <ul>
+                                <li>Redirects and forwarding</li>
+                                <li>Presence of suspicious keywords</li>
+                                <li>Website content and behavior</li>
+                                <li>External resource loading</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="mb-4">
+                    <h5>Stay Protected Online</h5>
+                    <p>Phishing remains one of the most common cyber attacks. Always verify the URLs you visit, be suspicious of unsolicited emails, and use tools like PhishGuard to check questionable links before clicking.</p>
+                </div>
+                
+                <div class="alert alert-warning">
+                    <div class="d-flex">
+                        <div class="me-3">
+                            <i class="fas fa-exclamation-triangle fa-2x"></i>
+                        </div>
+                        <div>
+                            <h5>Important Note</h5>
+                            <p class="mb-0">While we strive for accuracy, no phishing detection tool is 100% perfect. Always exercise caution with sensitive information online.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <a href="{{ url_for('index') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-1"></i> Try the URL Analyzer
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
